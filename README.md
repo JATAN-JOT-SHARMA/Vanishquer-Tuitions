@@ -1,39 +1,47 @@
-# Vanishquer Tuitions - Official Website
+# Vanishquer Tuitions — Wasmer Edge (free tier)
 
-A modern, fully dynamic, and responsive website built for **Vanishquer Tuitions (Vanquisher Academy)**, Solan. This project serves as both a public-facing educational portal and a comprehensive Content Management System (CMS) for the administration.
+Ready-to-deploy copy of the live Flask site, adapted for Wasmer.
 
-## 🌟 Key Features
+## What changed vs the Vercel version
+- Entry point moved to `app.py` at the project root (Wasmer's Python
+  detection looks for `requirements.txt` + `app.py`).
+- Database: if `DATABASE_URL` is not set, the app builds it from
+  Wasmer's auto-attached Postgres variables (`DB_HOST`, `DB_PORT`,
+  `DB_NAME`, `DB_USERNAME`, `DB_PASSWORD`).
+- S3: media-upload client creation is now guarded, so a missing S3
+  config does not break the public pages.
+- Google verification files (`google*.html`) are included at the root.
+- No secrets are included in this folder. Do NOT copy `env.txt` here.
 
-### For Visitors (Frontend)
-*   **Homepage:** A professional landing page featuring a Hero section, About Us, Why Choose Us, and dynamic previews of recent blogs and gallery images.
-*   **Counselling & Services:** A dedicated page addressing student counselling, slow learners, emotional motivation, and study habits.
-*   **Interactive Contact Form:** Includes a custom dropdown for users to select their specific counselling reasons (e.g., "Student feels frustrated", "Family disputes impacts").
-*   **Dynamic Blog:** A fully functional blog where visitors can read full articles (SEO-friendly URLs).
-*   **Media Gallery:** A responsive grid showcasing images and videos of the tuition center.
-*   **User Registration & Login:** Students/parents can create accounts and log in.
+## Files
+- `app.py` — Flask app (same routes, admin, blog, gallery, sitemap)
+- `requirements.txt` — Flask, Flask-SQLAlchemy, psycopg, dotenv, boto3
+- `google0bd254d159ad95bf.html`, `google8c6c685808935f55.html`
 
-### For Admin (Backend Dashboard)
-*   **Secure Admin Login:** Protected admin dashboard.
-*   **Inline Content Editor:** Easily edit the Homepage hero text, images, About Us content, and Contact details without touching the code.
-*   **Services Manager:** Edit the Counselling and Slow Learners page content directly from the dashboard.
-*   **Blog Management:** Create, edit, toggle visibility, and delete blog posts. Supports uploading images and videos.
-*   **Gallery Management:** Upload and delete images/videos directly to the gallery.
-*   **User Inquiries:** View all submitted contact forms, including the specific "Counselling Reason" selected by the user.
-*   **CSV Export:** Download all user inquiries as a CSV file with one click.
+## Deploy (free)
+1. Sign up / sign in at wasmer.io (Hobby / free plan).
+2. Create a new app from this folder (or push it to a repo and
+   connect that repo in the Wasmer dashboard).
+3. App name suggestion: `vanishquer-tuitions` — the URL will be
+   `https://vanishquer-tuitions-<your-username>.wasmer.app`
+   (or `https://vanishquer-tuitions.wasmer.app` if free).
+4. Environment variables, only if you want the live data instead of
+   a fresh Wasmer database:
+   - Reuse the existing Neon Postgres: set `DATABASE_URL` to the
+     existing Neon URL, plus `SECRET_KEY` and `ADMIN_PASSWORD`.
+   - For media uploads, set the existing `AWS_*` / S3 variables.
+   - If you leave `DATABASE_URL` unset, Wasmer attaches its own
+     Postgres (100 MB on the free plan) and the site starts empty —
+     you will need to re-add content via the admin panel.
+5. Deploy, then check `/`, `/robots.txt`, and `/sitemap.xml`.
 
-## 🛠️ Tech Stack
-*   **Backend:** Python (Flask)
-*   **Database:** PostgreSQL (Neon Serverless Postgres)
-*   **ORM:** SQLAlchemy
-*   **Storage:** S3-Compatible Object Storage (Neon Storage) for media uploads (supports up to 1GB video files).
-*   **Frontend:** HTML5, CSS3, JavaScript (Vanilla), Jinja2 Templating.
-*   **Deployment:** Vercel
+## Free-tier fit (checked 28 Oct 2026)
+Wasmer's free plan lists 1 app, 1,000,000 requests, 150 GB bandwidth
+and 6 hours active CPU — ample for this tuition site's traffic.
+The Vercel site at vanishqertuitions.vercel.app is NOT touched by
+this; Wasmer would be a second, separate address unless you later
+point a domain at it.
 
-## 🚀 Local Setup & Installation
-
-Follow these steps to run this project on your local machine:
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/your-username/your-repo-name.git
-   cd your-repo-name
+## Local test (done 28 Oct 2026)
+Syntax-checked, and run in a clean venv with a test database:
+`/` → 200, `/robots.txt` → 200, verification file → 200.
